@@ -1,10 +1,8 @@
 from flask import Flask ,request ,jsonify ,send_from_directory
-from flask_cors import CORS
 import json
 import os
 
 app = Flask(__name__)
-CORS(app, origins="http://localhost:3000")
 
 def load_products():
     with open('products.json','r') as f:
@@ -17,15 +15,11 @@ def load_products():
 def get_products(product_id=None):
     products = load_products()
     if product_id is None:
-    
-        
         return jsonify({"products":products})
     else:
         product= next((p for p in products if p['id'] == product_id), None)
-       
-        return jsonify(product), 200 if product else ('', 404)
-        
-
+        return jsonify(product) if product else ('', 404)
+    
 
 @app.route('/products/add', methods=['POST'])
 def add_product():
