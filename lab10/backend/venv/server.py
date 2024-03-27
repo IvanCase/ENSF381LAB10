@@ -41,29 +41,31 @@ def get_image(filename):
 
 @app.route('/products/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
+    update_product = request.json
     products = load_products()
     product = next((p for p in products if p['id'] == product_id), None)
-    if product:
-        product.update(request.json)
-        with open('products.json','w') as f:
-            json.dump({"products": products}, f)
-        return jsonify(product)
-    else:
-        return ('', 404)
+    if not product:
+        return jsonify({'error': 'Product not found'}), 404
+    product.update(update_product)
     
+    with open('products.json','w') as f:
+        json.dump({"products": products}, f)
+    return jsonify(product),200
     
 @app.route('/products/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
     products = load_products()
     product = next((p for p in products if p['id'] == product_id), None)
-    if product:
-        products.remove(product)
-        with open('products.json','w') as f:
-            json.dump({"products": products}, f)
-        return ('', 204)
-    else:
-        return ('', 404)
-    
+    if product is None:
+        return jsonify({'error': 'Product not found'}), 404
+    del products[products.index(product)]
+
+
+    with open ('products.json', 'w') as f:
+        json.dump({"products": products},f)
+    return jsonify({'message': 'Product deleted'}), 200
+
 
 if __name__ == '__main__':
+    
     app.run(debug=True)
