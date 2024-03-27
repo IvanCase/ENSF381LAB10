@@ -1,8 +1,10 @@
 from flask import Flask ,request ,jsonify ,send_from_directory
+from flask_cors import CORS
 import json
 import os
 
 app = Flask(__name__)
+CORS(app, origins="http://localhost:3000")
 
 @app.route('/api/v1/employees', methods=['GET'])
 @app.route('/prodcuts/<int:product_id>', methods=['GET'])
