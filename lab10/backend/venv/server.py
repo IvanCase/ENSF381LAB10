@@ -4,27 +4,25 @@ import os
 
 app = Flask(__name__)
 
-@app.route('/api/v1/employees', methods=['GET'])
-@app.route('/prodcuts/<int:product_id>', methods=['GET'])
-def get_products(product_id=None):
-    products = load_products()
-    if product_id is None:
-        with open('products.json') as f:
-            data = json.load(f)
-            for product in data:
-                if product['id'] == product_id:
-                    return jsonify(product)
-            return jsonify({'message': 'product not found'}), 404
-    else:
-        with open('products.json') as f:
-            data = json.load(f)
-            return jsonify(data)
-        
-        
 def load_products():
     with open('products.json','r') as f:
         return json.load(f)['products']   
 
+
+
+@app.route('/products', methods=['GET'])
+@app.route('/products/<int:product_id>', methods=['GET'])
+def get_products(product_id=None):
+    products = load_products()
+    if product_id is None:
+    
+        
+        return jsonify({"products":products})
+    else:
+        product= next((p for p in products if p['id'] == product_id), None)
+       
+        return jsonify(product), 200 if product else ('', 404)
+        
 
 
 @app.route('/products/add', methods=['POST'])
@@ -37,9 +35,9 @@ def add_product():
         json.dump({"products": products},f)
     return jsonify(new_product), 201
 
-@app.route('/products-images/<path:filename>')
+@app.route('/product-images/<path:filename>')
 def get_image(filename):
-    return send_from_directory('products-images', filename)
+    return send_from_directory('product-images', filename)
 
 
 if __name__ == '__main__':
